@@ -1,98 +1,71 @@
-import { useState, useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
 import { getTrades } from "@/lib/tradeStorage";
-import { Trade } from "@/types/trade";
-import TradeUploadForm from "@/components/TradeUploadForm";
+import { IndianRupee, ArrowUpDown, TrendingUp, Users } from "lucide-react";
+import StatCard from "@/components/StatCard";
 import TradeTable from "@/components/TradeTable";
+import Layout from "@/components/Layout";
 
-const Index = () => {
-  const [trades, setTrades] = useState<Trade[]>(getTrades());
-  const [nameFilter, setNameFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState<Date | undefined>();
+const Dashboard = () => {
+  const trades = getTrades();
 
-  const refresh = useCallback(() => setTrades(getTrades()), []);
+  const stats = useMemo(() => {
+    const totalINR = trades.reduce((s, t) => s + t.amountINR, 0);
+    const totalUSDT = trades.reduce((s, t) => s + t.amountINR / t.usdtRate, 0);
+    const uniqueBuyers = new Set(trades.map((t) => t.buyerName)).size;
+    const todayTrades = trades.filter((t) => t.date === format(new Date(), "yyyy-MM-dd"));
+    const todayINR = todayTrades.reduce((s, t) => s + t.amountINR, 0);
+    return { totalINR, totalUSDT, uniqueBuyers, todayTrades: todayTrades.length, todayINR };
+  }, [trades]);
 
-  const filtered = useMemo(() => {
-    let result = trades;
-    if (nameFilter.trim()) {
-      const q = nameFilter.toLowerCase();
-      result = result.filter((t) => t.buyerName.toLowerCase().includes(q));
-    }
-    if (dateFilter) {
-      const ds = format(dateFilter, "yyyy-MM-dd");
-      result = result.filter((t) => t.date === ds);
-    }
-    return result.sort((a, b) => b.date.localeCompare(a.date));
-  }, [trades, nameFilter, dateFilter]);
+  const recentTrades = useMemo(
+    () => [...trades].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10),
+    [trades]
+  );
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto flex items-center justify-between py-4 px-4">
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Shiloh Digital Pvt Ltd</h1>
-            <p className="text-xs text-muted-foreground">P2P Trade Management</p>
-          </div>
-          <div className="text-right text-xs text-muted-foreground">
-            <p>{format(new Date(), "dd MMM yyyy")}</p>
-          </div>
+    <Layout>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold">Dashboard</h2>
+          <p className="text-muted-foreground text-sm">Welcome back! Here's your trading overview.</p>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-6 space-y-6">
-        <Tabs defaultValue="trades">
-          <TabsList>
-            <TabsTrigger value="trades">Trade History</TabsTrigger>
-            <TabsTrigger value="upload">Upload Trades</TabsTrigger>
-          </TabsList>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Total Volume"
+            value={`₹${stats.totalINR.toLocaleString("en-IN")}`}
+            subtitle={`${trades.length} total trades`}
+            icon={IndianRupee}
+          />
+          <StatCard
+            title="USDT Traded"
+            value={stats.totalUSDT.toFixed(2)}
+            subtitle="Total USDT volume"
+            icon={ArrowUpDown}
+          />
+          <StatCard
+            title="Today's Volume"
+            value={`₹${stats.todayINR.toLocaleString("en-IN")}`}
+            subtitle={`${stats.todayTrades} trades today`}
+            icon={TrendingUp}
+            trend={stats.todayTrades > 0 ? "up" : "neutral"}
+          />
+          <StatCard
+            title="Unique Buyers"
+            value={String(stats.uniqueBuyers)}
+            subtitle="All-time unique buyers"
+            icon={Users}
+          />
+        </div>
 
-          <TabsContent value="trades" className="space-y-4 mt-4">
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by buyer name..."
-                  value={nameFilter}
-                  onChange={(e) => setNameFilter(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-full sm:w-[200px] justify-start", !dateFilter && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateFilter ? format(dateFilter, "dd MMM yyyy") : "Filter by date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <Calendar mode="single" selected={dateFilter} onSelect={setDateFilter} initialFocus className="pointer-events-auto" />
-                </PopoverContent>
-              </Popover>
-              {(nameFilter || dateFilter) && (
-                <Button variant="ghost" onClick={() => { setNameFilter(""); setDateFilter(undefined); }}>
-                  Clear
-                </Button>
-              )}
-            </div>
-            <TradeTable trades={filtered} onDelete={refresh} />
-          </TabsContent>
-
-          <TabsContent value="upload" className="mt-4 max-w-lg">
-            <TradeUploadForm onUpload={refresh} />
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+        <div className="glass-card rounded-xl p-6">
+          <h3 className="text-lg font-semibold mb-4">Recent Trades</h3>
+          <TradeTable trades={recentTrades} onDelete={() => window.location.reload()} />
+        </div>
+      </div>
+    </Layout>
   );
 };
 
-export default Index;
+export default Dashboard;
