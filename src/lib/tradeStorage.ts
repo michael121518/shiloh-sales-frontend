@@ -1,6 +1,7 @@
-import { Trade } from "@/types/trade";
+import { Trade, DateDocuments, StoredFile } from "@/types/trade";
 
 const STORAGE_KEY = "shiloh_trades";
+const DOCS_KEY = "shiloh_documents";
 
 export function getTrades(): Trade[] {
   const data = localStorage.getItem(STORAGE_KEY);
@@ -21,6 +22,16 @@ export function deleteTrade(id: string): void {
   saveTrades(trades);
 }
 
+let invoiceCounter = 0;
+
+function generateInvoiceNo(): string {
+  if (invoiceCounter === 0) {
+    invoiceCounter = getTrades().length;
+  }
+  invoiceCounter++;
+  return `SHL-${String(invoiceCounter).padStart(5, "0")}`;
+}
+
 export function parseCSVLine(line: string, date: string): Trade | null {
   const parts = line.split(",").map((s) => s.trim());
   if (parts.length < 4) return null;
@@ -30,10 +41,48 @@ export function parseCSVLine(line: string, date: string): Trade | null {
   if (!buyerName || isNaN(amountINR) || !orderId || isNaN(usdtRate)) return null;
   return {
     id: crypto.randomUUID(),
+    invoiceNo: generateInvoiceNo(),
     buyerName,
     amountINR,
     orderId,
     usdtRate,
     date,
   };
+}
+
+// Document storage
+export function getDocuments(): DateDocuments[] {
+  const data = localStorage.getItem(DOCS_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+function saveDocuments(docs: DateDocuments[]): void {
+  localStorage.setItem(DOCS_KEY, JSON.stringify(docs));
+}
+
+export function getDocumentsByDate(date: string): DateDocuments {
+  const docs = getDocuments();
+  return docs.find((d) => d.date === date) || { date, kyc: [], chargeSlips: [] };
+}
+
+export function addDocument(date: string, type: "kyc" | "chargeSlips", file: StoredFile): void {
+  const docs = getDocuments();
+  const existing = docs.find((d) => d.date === date);
+  if (existing) {
+    existing[type].push(file);
+  } else {
+    const newDoc: DateDocuments = { date, kyc: [], chargeSlips: [] };
+    newDoc[type].push(file);
+    docs.push(newDoc);
+  }
+  saveDocuments(docs);
+}
+
+export function removeDocument(date: string, type: "kyc" | "chargeSlips", fileId: string): void {
+  const docs = getDocuments();
+  const existing = docs.find((d) => d.date === date);
+  if (existing) {
+    existing[type] = existing[type].filter((f) => f.id !== fileId);
+    saveDocuments(docs);
+  }
 }

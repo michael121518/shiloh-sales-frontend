@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, ArrowUpDown, Upload, BarChart3 } from "lucide-react";
+import { LayoutDashboard, ArrowUpDown, Upload, BarChart3, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { to: "/trades", label: "Trades", icon: ArrowUpDown },
   { to: "/upload", label: "Upload", icon: Upload },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/documents", label: "Documents", icon: FolderOpen },
 ];
 
 const Navbar = () => {
