@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import TradesPage from "./pages/Trades";
 import UploadPage from "./pages/Upload";
 import AnalyticsPage from "./pages/Analytics";
+import DocumentsPage from "./pages/Documents";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/trades" element={<TradesPage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/documents" element={<DocumentsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
