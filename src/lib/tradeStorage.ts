@@ -22,10 +22,14 @@ export function deleteTrade(id: string): void {
   saveTrades(trades);
 }
 
+let invoiceCounter = 0;
+
 function generateInvoiceNo(): string {
-  const trades = getTrades();
-  const num = trades.length + 1;
-  return `SHL-${String(num).padStart(5, "0")}`;
+  if (invoiceCounter === 0) {
+    invoiceCounter = getTrades().length;
+  }
+  invoiceCounter++;
+  return `SHL-${String(invoiceCounter).padStart(5, "0")}`;
 }
 
 export function parseCSVLine(line: string, date: string): Trade | null {
