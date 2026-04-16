@@ -35,15 +35,12 @@ function generateInvoiceNo(): string {
 export function parseCSVLine(line: string, date: string): Trade | null {
   const parts = line.split(",").map((s) => s.trim());
   if (parts.length < 4) return null;
-
   const [buyerName, amountStr, orderId, rateStr] = parts;
   const amountINR = parseFloat(amountStr);
   const usdtRate = parseFloat(rateStr);
-
   if (!buyerName || isNaN(amountINR) || !orderId || isNaN(usdtRate)) return null;
-
   return {
-    id: Math.random().toString(36).substring(2, 10),
+    id: crypto.randomUUID(),
     invoiceNo: generateInvoiceNo(),
     buyerName,
     amountINR,
@@ -71,7 +68,6 @@ export function getDocumentsByDate(date: string): DateDocuments {
 export function addDocument(date: string, type: "kyc" | "chargeSlips", file: StoredFile): void {
   const docs = getDocuments();
   const existing = docs.find((d) => d.date === date);
-
   if (existing) {
     existing[type].push(file);
   } else {
@@ -79,14 +75,12 @@ export function addDocument(date: string, type: "kyc" | "chargeSlips", file: Sto
     newDoc[type].push(file);
     docs.push(newDoc);
   }
-
   saveDocuments(docs);
 }
 
 export function removeDocument(date: string, type: "kyc" | "chargeSlips", fileId: string): void {
   const docs = getDocuments();
   const existing = docs.find((d) => d.date === date);
-
   if (existing) {
     existing[type] = existing[type].filter((f) => f.id !== fileId);
     saveDocuments(docs);

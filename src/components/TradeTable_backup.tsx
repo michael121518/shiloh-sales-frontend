@@ -2,6 +2,7 @@ import { Trade } from "@/types/trade";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, FileDown } from "lucide-react";
+import { deleteTrade } from "@/lib/tradeStorage";
 import { generateInvoicePDF } from "@/lib/invoiceGenerator";
 
 interface Props {
@@ -10,28 +11,14 @@ interface Props {
 }
 
 const TradeTable = ({ trades, onDelete }: Props) => {
-  
-  const handleDelete = async (orderId: string) => {
-    // Confirmation Dialog
-    const confirmed = window.confirm("Are you sure you want to delete this trade?");
-    
-    if (!confirmed) return;
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/trades/${orderId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        onDelete(); // Refresh the list in the parent component
-      } else {
-        alert("Failed to delete the trade from the database.");
-      }
-    } catch (error) {
-      console.error("Delete Error:", error);
-      alert("Error connecting to server.");
-    }
+  const handleDelete = (id: string) => {
+    deleteTrade(id);
+    onDelete();
   };
+
+  if (trades.length === 0) {
+    return <p className="text-center text-muted-foreground py-8">No trades found.</p>;
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -51,12 +38,12 @@ const TradeTable = ({ trades, onDelete }: Props) => {
         <TableBody>
           {trades.map((t, i) => (
             <TableRow
-              key={t.orderId}
+              key={t.id}
               className="border-border/30 hover:bg-secondary/30 animate-fade-in"
               style={{ animationDelay: `${i * 30}ms` }}
             >
               <TableCell className="font-mono text-xs text-primary font-semibold">
-                INV-{t.orderId.slice(-6)}
+                {t.invoiceNo || "—"}
               </TableCell>
               <TableCell className="font-medium text-sm">{t.buyerName}</TableCell>
               <TableCell className="text-right text-sm text-primary font-semibold">
@@ -66,7 +53,7 @@ const TradeTable = ({ trades, onDelete }: Props) => {
                 {t.orderId.slice(0, 8)}…{t.orderId.slice(-4)}
               </TableCell>
               <TableCell className="text-right text-sm">₹{t.usdtRate}</TableCell>
-              <TableCell className="text-right text-sm text-green-600 font-medium">
+              <TableCell className="text-right text-sm text-success font-medium">
                 {(t.amountINR / t.usdtRate).toFixed(2)}
               </TableCell>
               <TableCell className="text-sm text-muted-foreground">{t.date}</TableCell>
@@ -81,12 +68,7 @@ const TradeTable = ({ trades, onDelete }: Props) => {
                   >
                     <FileDown className="h-3.5 w-3.5 text-primary/70" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => handleDelete(t.orderId)} 
-                    className="h-8 w-8 hover:bg-destructive/10"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(t.id)} className="h-8 w-8 hover:bg-destructive/10">
                     <Trash2 className="h-3.5 w-3.5 text-destructive/70" />
                   </Button>
                 </div>

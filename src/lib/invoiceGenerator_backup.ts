@@ -6,22 +6,17 @@ import { format, parseISO } from "date-fns";
 const COMPANY = {
   name: "SHILOH DIGITAL PVT LTD",
   address: [
-    "3-54A, East West Street, Kannirajapuram,",
-    "Kadaladi Tk, Ramanathapuram Dist,",
-    "Tamil Nadu – 623 123, India",
+    "3-54A, East West Street, Kannapuram,",
+    "Kjhhgladi Tk, Ramanathapuram Dist,",
+    "Tamil Nadu – 623 909, India",
   ],
-  gst: "33ABRCS4337B1ZE",
-  phone: "+91 98847 17488",
-  email: "shilohdigitalz@gmail.com",
-  upi: "yespay.bizsbiz192673@yesbankltd",
+  gst: "JKFJFHJHJFY8778776",
+  phone: "+91 98875 15489",
+  email: "shilhhh12@gmail.com",
+  upi: "asfdhhhiike@kjjjkiob",
 };
 
 export function generateInvoicePDF(trade: Trade): void {
-  // --- ADD THESE TWO SAFETY LINES ---
-  const invoiceNo = trade.invoiceNo || `INV-${trade.orderId.slice(-6)}`;
-  const displayDate = trade.date ? new Date(trade.date) : new Date();
-  // ----------------------------------
-
   const doc = new jsPDF();
   const pw = doc.internal.pageSize.getWidth();
   const usdt = (trade.amountINR / trade.usdtRate).toFixed(2);
@@ -56,13 +51,11 @@ export function generateInvoicePDF(trade: Trade): void {
 
   doc.setFontSize(10);
   doc.setTextColor(245, 196, 0);
-  // --- UPDATED TO USE OUR LOCAL invoiceNo ---
-  doc.text(invoiceNo, pw - 15, 28, { align: "right" });
+  doc.text(trade.invoiceNo, pw - 15, 28, { align: "right" });
 
   doc.setFontSize(8);
   doc.setTextColor(180, 185, 200);
-  // --- UPDATED TO USE displayDate TO AVOID PARSE ERRORS ---
-  doc.text(`Date: ${format(displayDate, "dd MMM yyyy")}`, pw - 15, 35, { align: "right" });
+  doc.text(`Date: ${format(parseISO(trade.date), "dd MMM yyyy")}`, pw - 15, 35, { align: "right" });
 
   // ── Company & Buyer info side-by-side ──
   const infoY = 62;
@@ -100,14 +93,14 @@ export function generateInvoicePDF(trade: Trade): void {
   // ── Trade details table ──
   autoTable(doc, {
     startY: infoY + 36,
-    head: [["#", "Description", "Rate", "Qty", "Amount"]],
+    head: [["#", "Description", "Rate (₹)", "Qty (USDT)", "Amount (₹)"]],
     body: [
       [
         "1",
-        "DIGITAL PRODUCT SUPPLY",
-        `${trade.usdtRate.toLocaleString("en-IN")}`,
+        "P2P USDT Trade",
+        `₹${trade.usdtRate.toLocaleString("en-IN")}`,
         usdt,
-        `${trade.amountINR.toLocaleString("en-IN")}`,
+        `₹${trade.amountINR.toLocaleString("en-IN")}`,
       ],
     ],
     theme: "striped",
@@ -144,7 +137,7 @@ export function generateInvoicePDF(trade: Trade): void {
 
   doc.setTextColor(40, 40, 50);
   doc.setFont("helvetica", "normal");
-  doc.text(`${trade.amountINR.toLocaleString("en-IN")}`, pw - 15, summaryY + 5, { align: "right" });
+  doc.text(`₹${trade.amountINR.toLocaleString("en-IN")}`, pw - 15, summaryY + 5, { align: "right" });
   doc.text("N/A", pw - 15, summaryY + 13, { align: "right" });
 
   // Total row
@@ -154,7 +147,7 @@ export function generateInvoicePDF(trade: Trade): void {
   doc.setFontSize(11);
   doc.setTextColor(15, 23, 42);
   doc.text("Total:", summaryX, summaryY + 28);
-  doc.text(`${trade.amountINR.toLocaleString("en-IN")}`, pw - 15, summaryY + 28, { align: "right" });
+  doc.text(`₹${trade.amountINR.toLocaleString("en-IN")}`, pw - 15, summaryY + 28, { align: "right" });
 
   // ── Payment details box ──
   const payY = summaryY + 45;
@@ -182,7 +175,7 @@ export function generateInvoicePDF(trade: Trade): void {
   doc.setFont("helvetica", "normal");
   doc.text("1. This is a computer-generated invoice and does not require a physical signature.", 15, termsY + 5);
   doc.text("2. Payment should be made via the UPI ID mentioned above.", 15, termsY + 10);
-  doc.text("3. Applicable taxes shall be deducted as per Prevailing Income Tax laws.", 15, termsY + 15);
+  doc.text("3. All disputes are subject to the jurisdiction of courts in Ramanathapuram, Tamil Nadu.", 15, termsY + 15);
 
   // ── Footer ──
   const footerY = doc.internal.pageSize.getHeight() - 15;
@@ -192,6 +185,5 @@ export function generateInvoicePDF(trade: Trade): void {
   doc.setFontSize(7);
   doc.text(`Generated on ${format(new Date(), "dd MMM yyyy, HH:mm")}  •  ${COMPANY.name}`, pw / 2, footerY + 2, { align: "center" });
 
-  // --- UPDATED FILENAME TO USE OUR LOCAL invoiceNo ---
-  doc.save(`${invoiceNo}-${trade.buyerName.replace(/\s+/g, "_")}.pdf`);
+  doc.save(`${trade.invoiceNo}-${trade.buyerName.replace(/\s+/g, "_")}.pdf`);
 }
