@@ -65,7 +65,7 @@ const Dashboard = () => {
         <div>
           <h2 className="text-2xl font-bold">Dashboard</h2>
           <p className="text-muted-foreground text-sm">
-            Welcome back! Here's your trading overview.
+            Welcome back! Here's your sales overview.
           </p>
         </div>
 
@@ -77,9 +77,9 @@ const Dashboard = () => {
             icon={IndianRupee}
           />
           <StatCard
-            title="USDT Traded"
+            title="Product Traded"
             value={stats.totalUSDT.toFixed(2)}
-            subtitle="Total USDT volume"
+            subtitle="Total Product volume"
             icon={ArrowUpDown}
           />
           <StatCard
@@ -98,7 +98,7 @@ const Dashboard = () => {
         </div>
 
         <div className="glass-card rounded-xl p-6">
-          <h3 className="text-lg font-semibold mb-4">Recent Trades</h3>
+          <h3 className="text-lg font-semibold mb-4">Recent Sales</h3>
           <TradeTable
             trades={recentTrades}
             onDelete={() => window.location.reload()}

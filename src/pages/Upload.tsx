@@ -68,7 +68,7 @@ const UploadPage = () => {
       <div className="max-w-2xl mx-auto space-y-6">
         <div>
           <h2 className="text-2xl font-bold">Upload Trades</h2>
-          <p className="text-muted-foreground text-sm">Add daily P2P trade records</p>
+          <p className="text-muted-foreground text-sm">Add daily sales records</p>
         </div>
 
         <div className="glass-card rounded-xl p-6 space-y-5">
@@ -110,7 +110,7 @@ const UploadPage = () => {
             </div>
 
             <Textarea
-              placeholder={`BUYER NAME,AMOUNT INR,ORDER ID,USDT RATE
+              placeholder={`BUYER NAME,AMOUNT INR,ORDER ID,PRODUCT RATE
 DHARMENDRASINH RANJEETSINH PARMAR,6500,22875436809660768256,102.2
 SAPKAL HARSHEL ASHOK,9000,22875438529773518848,102.2`}
               value={csvText}
@@ -122,7 +122,7 @@ SAPKAL HARSHEL ASHOK,9000,22875438529773518848,102.2`}
             <p className="text-xs text-muted-foreground">
               One trade per line:{" "}
               <span className="text-primary">
-                Name, Amount (INR), Order ID, USDT Rate
+                Name, Amount (INR), Order ID, Product Rate
               </span>
             </p>
           </div>
@@ -144,7 +144,7 @@ SAPKAL HARSHEL ASHOK,9000,22875438529773518848,102.2`}
             <div className="bg-secondary/30 rounded p-2 text-center">Buyer Name</div>
             <div className="bg-secondary/30 rounded p-2 text-center">Amount ₹</div>
             <div className="bg-secondary/30 rounded p-2 text-center">Order ID</div>
-            <div className="bg-secondary/30 rounded p-2 text-center">USDT Rate</div>
+            <div className="bg-secondary/30 rounded p-2 text-center">Product Rate</div>
           </div>
         </div>
       </div>

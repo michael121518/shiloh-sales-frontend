@@ -126,7 +126,7 @@ const DocumentsPage = () => {
         </div>
 
         <div className="glass-card rounded-xl p-4 flex items-center gap-4 border border-border/50">
-          <label className="text-sm font-medium">Trade Date:</label>
+          <label className="text-sm font-medium">Sale Date:</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-[240px] justify-start">

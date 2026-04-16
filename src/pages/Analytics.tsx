@@ -95,7 +95,7 @@ const AnalyticsPage = () => {
         <div>
           <h2 className="text-2xl font-bold">Analytics</h2>
           <p className="text-muted-foreground text-sm">
-            Trade volume trends and insights
+            Sale volume trends and insights
           </p>
         </div>
 
@@ -160,7 +160,7 @@ const AnalyticsPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="glass-card rounded-xl p-6">
                 <h3 className="text-sm font-semibold mb-4">
-                  Daily Trade Count
+                  Daily Sale Count
                 </h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={dailyData}>
