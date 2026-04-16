@@ -72,7 +72,7 @@ const TradesPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">Trade History</h2>
-            <p className="text-muted-foreground text-sm">PostgreSQL Connection Active</p>
+            <p className="text-muted-foreground text-sm"></p>
           </div>
           <Button onClick={fetchTrades} variant="outline" size="sm" className="gap-2">
             <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} /> Refresh
